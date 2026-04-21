@@ -1,46 +1,41 @@
 from django.db import models
-from cadastro.models import Personagem
-from datetime import timedelta
-from django.utils import timezone
+from apps.cadastro.models import Jedi #importa a outra tabela de cadastro
 
-class Curso(models.Model):
+
+class Treinamento(models.Model): #cria outra tabela
     nome = models.CharField(max_length=200)
-    carga_horaria = models.IntegerField()
-    validade_meses = models.IntegerField()
+    carga_horaria = models.IntegerField() #inteiro
+    validade = models.IntegerField(help_text="Validade em dias") #help aparece no amdin como uma dica
     descricao = models.TextField()
 
     def __str__(self):
         return self.nome
+    
 
 
 class Missao(models.Model):
-    jedi = models.ForeignKey(Personagem, on_delete=models.CASCADE)
-    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    STATUS_CHOICES = [ #tabela de opções fixas
+        ('ATIVO', 'Conectado à Força'),
+        ('VENCIDO', 'Desconectado da Força'),
+    ]
+
+
+    #on_delete=models.CASCADE significa que se o jedi for deletado as missoes dele serão apagadas
+    jedi = models.ForeignKey(Jedi, on_delete=models.CASCADE) #cada missão pertence a um unico jedi
+    treinamento = models.ForeignKey(Treinamento, on_delete=models.CASCADE)
 
     data_inicio = models.DateField()
-    observacoes = models.TextField(blank=True)
-    anexo = models.FileField(upload_to='missoes/', null=True, blank=True)
+    data_validade = models.DateField()
 
-    def data_vencimento(self):
-        return self.data_inicio + timedelta(days=30 * self.curso.validade_meses)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES) #opções da tabela fixa
 
-    def dias_para_vencer(self):
-        return (self.data_vencimento() - timezone.now().date()).days
+    relatorio = models.TextField(blank=True, null=True)
+    anexo = models.FileField(upload_to='missoes/', blank=True, null=True) #upload de arquivos
 
-    def status(self):
-        dias = self.dias_para_vencer()
-
-        if dias < 0:
-            return "Vencido"
-        elif dias <= 10:
-            return "Crítico"
-        elif dias <= 30:
-            return "Alerta"
-        elif dias <= 60:
-            return "Atenção"
-        elif dias <= 90:
-            return "Planejamento"
-        return "OK"
-
+    #como vai aparecer no admin
     def __str__(self):
-        return f"{self.jedi.nome} - {self.curso.nome}"
+        return f"{self.jedi.nome} - {self.treinamento.nome}"
+
+    class Meta: #personalização do admin
+        verbose_name = "Missão"
+        verbose_name_plural = "Missões"

@@ -1,0 +1,9 @@
+<h1>Missões</h1>
+
+<ul>
+    {% for m in missoes %}
+        <li>
+            {{ m.jedi.nome }} - {{ m.treinamento.nome }} - {{ m.status }}
+        </li>
+    {% endfor %}
+</ul>

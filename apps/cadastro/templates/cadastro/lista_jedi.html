@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Lista de Jedi</h1>
+
+<a href="/jedi/novo/" class="btn btn-primary">Novo Jedi</a>
+
+<ul class="mt-3">
+    {% for jedi in jedis %}
+        <li>{{ jedi.nome }} - {{ jedi.rank }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

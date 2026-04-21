@@ -1,0 +1,7 @@
+<h1>Treinamentos</h1>
+
+<ul>
+    {% for t in treinamentos %}
+        <li>{{ t.nome }} - {{ t.carga_horaria }}h</li>
+    {% endfor %}
+</ul>
